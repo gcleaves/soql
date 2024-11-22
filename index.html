@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOQL Query Playground</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/themes/light.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/shoelace-autoloader.js"></script>    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input, textarea, button { display: block; margin-top: 10px; width: 100%; }
+        textarea { height: 100px; }
+    </style>
+</head>
+<body>
+    <h1>Salesforce SOQL Query Playground</h1>
+    <sl-button type="primary" onclick="document.querySelector('sl-drawer').show()">Open Config</sl-button>
+    <sl-drawer label="Configuration" placement="end">
+        <div>
+            <label for="instanceUrl">Salesforce Instance URL:</label>
+            <input type="text" id="instanceUrl" placeholder="Instance URL">
+
+            <label for="clientId">Client ID:</label>
+            <input type="text" id="clientId" placeholder="Client ID">
+
+            <label for="clientSecret">Client Secret:</label>
+            <input type="password" id="clientSecret" placeholder="Client Secret">
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Username">
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Password">
+        </div>
+        <sl-button slot="footer" type="primary" onclick="document.querySelector('sl-drawer').hide()">Close</sl-button>
+    </sl-drawer>
+
+    <div>
+        <h2>Run SOQL Query</h2>
+        <textarea id="soqlQuery" placeholder="Enter your SOQL query here..."></textarea>
+        <button onclick="runQuery()">Run Query</button>
+    </div>
+
+    <h2>Results</h2>
+    <pre id="results"></pre>
+
+    <script>
+        // Load settings from local storage
+        document.addEventListener("DOMContentLoaded", function() {
+            const instanceUrl = localStorage.getItem("instanceUrl");
+            const clientId = localStorage.getItem("clientId");
+            const clientSecret = localStorage.getItem("clientSecret");
+            const username = localStorage.getItem("username");
+            const password = localStorage.getItem("password");
+            const soqlQuery = localStorage.getItem("soqlQuery");
+
+            if (instanceUrl) document.getElementById("instanceUrl").value = instanceUrl;
+            if (clientId) document.getElementById("clientId").value = clientId;
+            if (clientSecret) document.getElementById("clientSecret").value = clientSecret;
+            if (username) document.getElementById("username").value = username;
+            if (password) document.getElementById("password").value = password;
+            if (soqlQuery) document.getElementById("soqlQuery").value = soqlQuery;
+        });
+
+        function saveFieldToLocalStorage(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.addEventListener('change', () => {
+                localStorage.setItem(fieldId, field.value);
+            });
+        }
+
+        // Add event listeners to save fields automatically
+        saveFieldToLocalStorage("instanceUrl");
+        saveFieldToLocalStorage("clientId");
+        saveFieldToLocalStorage("clientSecret");
+        saveFieldToLocalStorage("username");
+        saveFieldToLocalStorage("password");
+        saveFieldToLocalStorage("soqlQuery");
+
+        // Run the SOQL query
+        async function runQuery() {
+            const instanceUrl = document.getElementById("instanceUrl").value;
+            const clientId = document.getElementById("clientId").value;
+            const clientSecret = document.getElementById("clientSecret").value;
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const soqlQuery = document.getElementById("soqlQuery").value;
+
+            if (!instanceUrl || !clientId || !clientSecret || !username || !password || !soqlQuery) {
+                alert("Please ensure all fields are filled in.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/run-query', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        instanceUrl,
+                        clientId,
+                        clientSecret,
+                        username,
+                        password,
+                        soqlQuery
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                document.getElementById("results").textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById("results").textContent = error.message;
+            }
+        }
+        
+        </script>
+</body>
+</html>
