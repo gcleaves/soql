@@ -84,7 +84,6 @@ app.post('/run-query', async (req, res) => {
         }
 
         const tokenData = await tokenResponse.json();
-        console.log(tokenData);
         const accessToken = tokenData.access_token;
 
         // Run SOQL query
