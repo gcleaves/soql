@@ -106,7 +106,9 @@ app.post('/run-query', async (req, res) => {
     }
 });
 
-// Start the server
+// Initialize the Express server and begin listening for incoming connections
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server successfully started and is now listening on port ${PORT}`);
+    console.log(`You can access the server at http://localhost:${PORT}`);
+    console.log('Ready to handle incoming HTTP requests...');
 });
