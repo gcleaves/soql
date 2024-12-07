@@ -1,6 +1,6 @@
 # Salesforce SOQL Query Playground
 
-Little tool to run SOQL queries on your instance.
+Little tool to run SOQL queries on your instance. Config is stored to the browser's local storage.
 
 ## Execute
 
